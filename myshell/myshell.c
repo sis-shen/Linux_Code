@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define LINE_SIZE 1024
 #define ARGV_SIZE 1024
@@ -62,6 +64,21 @@ void Interact(char*cline,int size)
   printf("echo: %s\n",cline);
 }
 
+void ExeternalCommand()
+{
+  pid_t id =fork();
+  if(id == 0)
+  {
+    execvp(argv[0],argv+1);
+    exit(446);
+  }
+  else 
+  {
+    waitpid(id,NULL,0);
+    return;
+  }
+}
+
 int main()
 {
   int quit = 0;
@@ -71,7 +88,7 @@ int main()
     int argv_n;
     Splitcline(cline,argv,&argv_n);
 
-    
+    ExeternalCommand();
 
 
   }
