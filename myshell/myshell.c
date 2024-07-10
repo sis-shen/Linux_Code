@@ -102,7 +102,7 @@ int BuildCommand(char* _argv[],int _argv_n)//处理内建命令
     chdir(argv[1]);
     getpwd();
     sprintf(getenv("PWD"),"%s",pwd);
-    
+    return 1;
   }
   return 0;
 }
@@ -121,8 +121,6 @@ int main()
     
     int flag = BuildCommand(argv,argv_n);
     if(!flag) ExeternalCommand();
-
-
   }
 
   return 0;
