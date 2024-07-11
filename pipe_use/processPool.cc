@@ -1,5 +1,6 @@
 #include "task.hpp"
 #include <string>
+#include <ctime>
 
 const int processNum = 5;//最大进程数
 
@@ -26,7 +27,12 @@ void slaver()
     }
 }
 
-void InitChannels(std::vector<channel>& channels)
+//形参命名约定
+//输入: const &
+//输出: *
+//输入输出: &
+
+void InitChannels(std::vector<channel>* channels)
 {
     for(int i = 0;i<processNum;i++)
     {
@@ -39,22 +45,25 @@ void InitChannels(std::vector<channel>& channels)
         if(id == 0)//child
         {
             close(pipefd[1]);
+            dup2(pipefd[0],0);//输入重定向
             slaver();
+            //slaver(pipefd[0]);
             exit(0);
-        }
+        } 
         //father
         close(pipefd[0]);
         std::string name = "process-"+std::to_string(i);
-        channels.push_back(channel(pipefd[1],id,name));
+        channels->push_back(channel(pipefd[1],id,name));
     }
 }
 
 
 int main()
 {
+    srand(time(nullptr) ^ getpid()^1023);//种随机数种子
     std::vector<channel> channels;
     //初始化
-    InitChannels(channels);
+    InitChannels(&channels);
 
     for(auto &c:channels)
     {
