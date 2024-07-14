@@ -3,6 +3,7 @@
 #include <ctime>
 
 const int processNum = 5;//最大进程数
+std::vector<task_t> tasks;
 
 //先描述
 class channel
@@ -57,6 +58,14 @@ void InitChannels(std::vector<channel>* channels)
     }
 }
 
+void Debug(const std::vector<channel> channels)
+{
+    for(auto &c:channels)
+    {
+        std::cout<<c._cmdfd << " " << c._slaverid<< " " << c._processname << std::endl;
+    }
+}
+
 
 int main()
 {
@@ -64,10 +73,10 @@ int main()
     std::vector<channel> channels;
     //初始化
     InitChannels(&channels);
+    LoadTask(&tasks);
 
-    for(auto &c:channels)
-    {
-        std::cout<<c._cmdfd << " " << c._slaverid<< " " << c._processname << std::endl;
-    }
+    Debug(channels);
+
+
     return 0;
 }
