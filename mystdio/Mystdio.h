@@ -20,5 +20,6 @@ typedef struct IO_FILE{
 _FILE * _fopen(const char *filename,const char *flag);
 int _fwrite(_FILE* fp,const char*s, int len);
 void _fclose(_FILE* fp);
+void _fflush(_FILE* fp);
 
 #endif 

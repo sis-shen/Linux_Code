@@ -8,5 +8,6 @@ int main()
     const char*msg = "hello mystdio";
 
     _fwrite(fp,msg,strlen(msg));
+    _fclose(fp);
     return 0;
 }

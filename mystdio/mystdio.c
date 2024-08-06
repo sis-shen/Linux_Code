@@ -44,13 +44,13 @@ int _fwrite(_FILE *fp,const char* s,int len)
     fp->out_pos +=len;//简易偏移out_pos
     if(fp->fileno == FLUSH_NONE)
     {
-        wrtie(fp->fileno,s,fp->out_pos);//无缓冲区的写入版本
+        write(fp->fileno,s,fp->out_pos);//无缓冲区的写入版本
     }
     else if(fp->flag == FLUSH_LINE)
     {
         if(fp->outbuffer[fp->out_pos-1] == '\n')
         {
-            wrtie(fp->fileno,s,fp->out_pos);//立即刷新
+            write(fp->fileno,s,fp->out_pos);//立即刷新
             fp->out_pos = 0;
         }
         else{
@@ -61,7 +61,7 @@ int _fwrite(_FILE *fp,const char* s,int len)
     {
         if(fp->out_pos == SIZE)
         {
-            wrtie(fp->fileno,s,fp->out_pos);//立即刷新
+            write(fp->fileno,s,fp->out_pos);//立即刷新
             fp->out_pos = 0;
         }
         else{
@@ -70,9 +70,19 @@ int _fwrite(_FILE *fp,const char* s,int len)
     }
 }
 
+void _fflush(_FILE* fp)
+{
+    if(fp->out_pos > 0)
+    {
+        write(fp->fileno,fp->outbuffer,fp->out_pos);//立即刷新
+        fp->out_pos = 0;
+    }
+}
+
 void _fclose(_FILE* fp)
 {
     if(fp == NULL) return;//防止空指针
+    _fflush(fp);//刷新缓冲区
     close(fp->fileno);//关闭文件
     free(fp);//释放资源
 }
