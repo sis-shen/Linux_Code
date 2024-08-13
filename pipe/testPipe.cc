@@ -14,7 +14,7 @@ using namespace std;
 //child
 void Writer(int wfd)
 {
-    string s = "hello,I am child";
+    string s = "hello,I am child";//准备子进程的报文
     pid_t self = getpid();
     int number = 5;
 
@@ -51,6 +51,7 @@ void Reader(int rfd)
 int main()
 {
     int pipefd[N] = {0};
+    
     int n = pipe(pipefd);
     if(n<0) return 1;
 

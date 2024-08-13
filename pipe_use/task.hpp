@@ -8,6 +8,8 @@
 #include <sys/wait.h>
 #include <cassert>
 #include <iostream>
+#include <string>
+
 
 typedef void (*task_t)();
 
@@ -34,5 +36,4 @@ void LoadTask(std::vector<task_t>*tasks)
     tasks->push_back(task2);
     tasks->push_back(task3);
     tasks->push_back(task4);
-
 }

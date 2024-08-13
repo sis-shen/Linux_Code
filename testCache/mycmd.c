@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 int main()
 {
-    fwrite("666",1,4,stdout);  
-    fwrite("666",1,4,stderr);  
-    _exit(0);
-    return ;
+    printf("hello1 ");//父进程向标准输出打印一句话
+    fprintf(stdout,"hello2 ");//父进程向标准输出打印一句话
+
+    fork();
+    return 0;
 }
