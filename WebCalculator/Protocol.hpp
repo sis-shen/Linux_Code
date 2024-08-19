@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <string>
+#include <jsoncpp/json/json.h>
+
+// #define Myself 1
 
 const std::string blank_space_sep = " ";
 const std::string protocal_sep = "\n";
@@ -46,6 +49,7 @@ public:
     {
         // struct =>string x op y
         // 有效载荷
+#ifdef Myself
         std::string s = std::to_string(x);
         s += blank_space_sep;
         s += op;
@@ -55,10 +59,20 @@ public:
         // 封装报头
         *out = s;
         return true;
+#else 
+        Json::Value root;
+        root["x"] = x;
+        root["y"]  =y;
+        root["op"] = op;
+        Json::FastWriter fw;
+        *out = fw.write(root);
+        return true;
+#endif
     }
 
     bool Deserialize(const std::string &in)
     {
+#ifdef Myself
         size_t left_pos = in.find(blank_space_sep);
         if(left_pos == std::string::npos) return false;
         std::string part_x = in.substr(0,left_pos);
@@ -73,6 +87,17 @@ public:
         x = std::stoi(part_x);
         y = std::stoi(part_y);
         return true;
+
+#else 
+    Json::Value root;
+    Json::Reader r;
+    r.parse(in,root);
+    x = root["x"].asInt();
+    y = root["y"].asInt();
+    op = root["op"].asInt();
+    return true;
+
+#endif
     }
 
 public:
@@ -91,17 +116,27 @@ public:
 
     bool Serialize(std::string *out)
     {
+#ifdef Myself
         std::string s = std::to_string(result);
         s += blank_space_sep;
         s += std::to_string(code);
 
         // 封装报头
        *out =s;
+#else 
+        Json::Value root;
+        root["result"] = result;
+        root["code"]  =code;
+        Json::FastWriter fw;
+        *out = fw.write(root);
+        return true;
+#endif
         return true;
     }
 
     bool Deserialize(const std::string &in)
     {
+#ifdef Myself
         size_t pos = in.find(blank_space_sep);
         if(pos == std::string::npos) return false;
         std::string part_left = in.substr(0,pos);
@@ -109,6 +144,15 @@ public:
 
         result = std::stoi(part_left);
         code = std::stoi(part_right);
+#else 
+    Json::Value root;
+    Json::Reader r;
+    r.parse(in,root);
+    result = root["result"].asInt();
+    code = root["code"].asInt();
+    return true;
+
+#endif
         return true;
     }
 
