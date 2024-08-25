@@ -7,10 +7,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include "log.hpp"
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include "log.hpp"
 
 enum{
     SOCK_ERR = 2
@@ -36,6 +36,8 @@ public:
             log(Fatal,"socket error,errno: %d error string:%s",errno,strerror(errno));
             exit(SOCK_ERR);
         }
+        int opt = 1;
+        setsockopt(_sockfd,SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT,&opt,sizeof(opt));
     }
     void Bind(uint16_t port)
     {  

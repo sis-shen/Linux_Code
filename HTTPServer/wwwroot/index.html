@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+</head>
+
+<body>
+    <h1 style="background-color: aqua;"><a href="./a/b/hello.html" style="text-decoration: none;">Hello world</a></h1>
+    <h1 style="background-color: aqua;">你好，世界</h1>
+    <h1 style="background-color: aqua;">你好，世界</h1>
+    <h1 style="background-color: aqua;">你好，世界</h1>
+
+    <form action = "/a/b/hello.html" method=get>  <!-- get是通过url提交参数的 -->
+        <label>(get)Name:
+            <input name="submitted-name" autocomplete="name" />
+        </label>
+        <button  type="submit">Save</button>
+    </form>
+    <div style="margin-top:2em;">
+        <form action = "/a/b/hello.html" method=post style="background-color: antiquewhite;">  <!-- get是通过url提交参数的 -->
+            <label>(post)Name:
+                <input name="submitted-name" autocomplete="name" />
+            </label>
+            <button  type="submit">Save</button>
+        </form>
+    </div>
+
+    <div class="myimgs" style="height: 400px;display: flex;">
+        <div style="display: flex;width: 50%;justify-content: center;">
+            <img src="./img/p1.jpg" alt="图片1">
+        </div>
+        <div style="display: flex;width: 50%;justify-content: center;">
+            <img src="./img/p2.jpg" alt="图片2" >    
+        </div>
+
+    </div>
+</body>
+
+</html>

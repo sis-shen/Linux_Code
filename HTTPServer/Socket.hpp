@@ -36,6 +36,8 @@ public:
             log(Fatal,"socket error,errno: %d error string:%s",errno,strerror(errno));
             exit(SOCK_ERR);
         }
+        int opt = 1;
+        setsockopt(_sockfd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
     }
     void Bind(uint16_t port)
     {  
