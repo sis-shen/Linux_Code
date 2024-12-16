@@ -26,15 +26,14 @@ int main() {
 
         res->close();
 
-        stmt->executeUpdate("insert into t1 values(255,'神奇')");
-
         res.reset(stmt->executeQuery("select * from t1"));
         auto rsm(res->getMetaData());
         std::cout<<rsm->getColumnCount()<<std::endl;
 
         while(res->next())
         {
-            std::cout<<res->getRow()<<std::endl;
+            std::cout<<res->getRow()<<" ";
+            std::cout<<res->getInt(1)<<std::endl;
         }
 
     } catch (sql::SQLException &e) {

@@ -14,11 +14,11 @@
 
 const std::string wwwroot = "./wwwroot"; // web根目录
 const std::string sep = "\r\n";
-const std::string homepage = "/index.html";
+const std::string homepage = "/index.html";//主页文件
 
-const uint16_t default_port = 25565;
+const uint16_t default_port = 25565;//HTTP通信使用的端口
 
-class HttpServer;
+class HttpServer;//提前声明
 
 struct ThreadData
 {
@@ -37,6 +37,7 @@ public:
     {
         while (true)
         {
+            //逐行分解首部
             std::size_t pos = req.find(sep);
             if (pos == std::string::npos)
                 break;
@@ -46,38 +47,39 @@ public:
             req_header.push_back(temp);
             req.erase(0, pos + sep.size());
         }
+        //将剩下的Body存入text
         text = req;
     }
 
     void Parse()
     {
-        std::stringstream ss(req_header[0]);
+        std::stringstream ss(req_header[0]);//获取首部的首行
         ss >> _method >> _url >> _http_version;
-        _res_path = wwwroot;
+        _res_path = wwwroot;//获取根目录
         if(_url == "/" || _url == "index.html")_res_path+= homepage;
-        else _res_path += _url;
+        else _res_path += _url;//非首页的处理方式
 
         auto pos = _res_path.find(".");
-        if(pos == std::string::npos) _suffix = ".html";
+        if(pos == std::string::npos) _suffix = ".html";//自动添加文件后缀
         else _suffix = _res_path.substr(pos);
     }
 
     void DebugPrint()
     {
+        //逐行打印首部
         std::cout << "\n----------------------------\n";
         for (auto &line : req_header)
         {
             std::cout << line << "\n\n";
         }
         std::cout << "----------------------------\n";
-        std::cout<<text<<std::endl;
+        std::cout<<text<<std::endl;//打印Body
 
+        //打印获取到的信息
         std::cout<<"methond: "<<_method<<std::endl;
         std::cout<<"url: "<<_url<<std::endl;
         std::cout<<"http version: "<<_http_version<<std::endl;
         std::cout<<"resource path: "<<_res_path<<std::endl;
-
-
     }
 
 public:
@@ -149,12 +151,6 @@ public:
         std::string content;
         content.resize(len);
         in.read((char*)content.c_str(),content.size());
-
-        // std::string line;
-        // std::string content;
-
-        // while (std::getline(in, line))
-        //     content += line;
 
         in.close();
         return content;
