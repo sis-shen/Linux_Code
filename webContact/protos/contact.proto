@@ -1,0 +1,74 @@
+syntax = "proto3";
+package contact;
+
+message PeopleInfo{
+    string name = 1;
+    int32 age = 2;
+    message Phone{
+        enum type{
+            MOBILE = 0 ;
+            TELEPHONE = 1;
+        };
+    }
+
+    repeated Phone phones = 3;
+}
+
+message Contacts{
+    repeated PeopleInfo contacts = 1;
+}
+
+enum WebStatus
+{
+    SUCCESS = 0;
+    CLIENT_ERR = 1;
+    SERVER_ERR = 2;
+}
+// "/add"  =================
+message AddContactRequest{
+    string msg = 1;
+    WebStatus status = 2;
+
+    PeopleInfo people = 3;
+}
+
+message AddContactResponse{
+    string msg = 1;
+    WebStatus status = 2;
+}
+
+// "del" ===============
+message DelContactRequest{
+    string msg = 1;
+    WebStatus status = 2;
+
+    string name = 3;
+}
+
+message DelContactResponse{
+    string msg = 1;
+    WebStatus status = 2;
+}
+
+// "find"  =============
+message FindContactRequest{
+    string msg = 1;
+    WebStatus status = 2;
+
+    string name = 3;
+}
+
+message FindContactResponse{
+    string msg = 1;
+    WebStatus status = 2;
+
+    PeopleInfo people = 3;
+}
+
+// "list"  =============
+message ListContactResponse{
+    string msg = 1;
+    WebStatus status = 2;
+
+    Contacts contacts = 3;
+}
