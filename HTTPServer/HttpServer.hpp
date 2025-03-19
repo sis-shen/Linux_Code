@@ -206,16 +206,17 @@ public:
             response_header += "\r\n";
             response_header += httpsvr->Suffix2Desc(req._suffix);
             response_header += "\r\n";
-            response_header+="Set-Cookie: name=supdriver";
-            response_header += "\r\n";
-            response_header+="Set-Cookie: password=password";
-            response_header += "\r\n";
-            response_header+="Set-Cookie: view=./a/b/hello.html";
-            response_header += "\r\n";            
+            // response_header+="Set-Cookie: name=supdriver";
+            // response_header += "\r\n";
+            // response_header+="Set-Cookie: password=password";
+            // response_header += "\r\n";
+            // response_header+="Set-Cookie: view=./a/b/hello.html";
+            // response_header += "\r\n";            
             //response_header += "Location: https://www.supdriver.top/\r\n"; //重定向
             std::string block_line = "\r\n";
 
             std::string response = response_line;
+            // std::string response = "";
             response += response_header;
             response += block_line;
             response += text;

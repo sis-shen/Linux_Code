@@ -84,8 +84,6 @@ protected:
         }
     }
 
-
-
 protected:
     int _listen_sock;
     uint16_t _port;
