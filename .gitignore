@@ -31,4 +31,5 @@
 *.out
 *.app
 
-cpp-httplib/*
+cpp-httplib
+perfTest/FlameGragh/*
