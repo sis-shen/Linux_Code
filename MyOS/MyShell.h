@@ -84,6 +84,9 @@ public:
                      << "  deletefile <name>\n"
                      << "  exit\n";
             }
+            else  {
+                os.run_one_cycle();
+            }
 
             
         }

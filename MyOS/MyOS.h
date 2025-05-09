@@ -12,7 +12,7 @@ using namespace std;
 namespace sup{
     class MyOS
     {
-        MyOS();
+        MyOS(){};
         MyOS(const MyOS&) = delete;
         MyOS operator=(const MyOS&) = delete;
     public:

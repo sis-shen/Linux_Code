@@ -2,23 +2,25 @@
 
 using namespace sup;
 
-void MyOS::createproc(const string&proc_name,uint64_t TTL,uint64_t mem_sz,uint64_t io_start,uint64_t io_end)
+void MyOS::createproc(const std::string&proc_name,uint64_t TTL,uint64_t mem_sz,uint64_t io_start,uint64_t io_end)
 {
     proc_creat(proc_name,TTL,mem_sz,io_start,io_end);
 }
 
-void MyOS::proc_creat(const string&proc_name,uint64_t TTL,uint64_t mem_sz,uint64_t io_start,uint64_t io_end)
+void MyOS::proc_creat(const std::string&proc_name,uint64_t TTL,uint64_t mem_sz,uint64_t io_start,uint64_t io_end)
 {
     PCB pcb;
     int64_t pid = proc_create_pid();
     if(pid == -1) return ;//创建失败了
     pcb._PID = pid;
-    pcb._start = _time;
-    pcb._end = (_time + TTL)%OS_MAX_TIME;
+    pcb._TTL = TTL;
+    pcb._lifelong = 0;
+    pcb._name = proc_name;
     if(io_start > io_end)
     {
-        pcb._io_start = pcb._start + io_start;
-        pcb._io_start = pcb._start + io_end;
+        pcb._io_start = io_start;//这里存的是相对时间
+        pcb._io_time = io_end-io_start;
+        pcb._io_end = 0;        //这里存的是系统时间
         pcb._has_io = true;
     }
     else{
@@ -28,8 +30,9 @@ void MyOS::proc_creat(const string&proc_name,uint64_t TTL,uint64_t mem_sz,uint64
     auto mem = new MemoryStruct;
     mem->total_size = mem_sz;
     pcb._memory_struct = mem;
-    pcb._status = PCB::READY;
+    pcb._status = PCB::CREATE;
     pcb._slice_len = ROUND_LEN;
+    if(!_ready_list.empty())pcb._status = PCB::READY;
     _ready_list.push_back(pcb);
 }
 
@@ -40,39 +43,48 @@ void MyOS::killproc(pid_t pid)
 }
 void MyOS::psproc()
 {
-    printf("pid    status    address    size");
+    printf("name    pid    status    address    size\n");
     for(auto& pcb: _ready_list)
     {
-        printf("%-7u%-10s%-11u%u\n",pcb._PID,pcb.getStatStr(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
+        printf("%-8s%-7u%-10s%-11u%u\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
     }
 
     for(auto& pcb: _blocked_list)
     {
-        printf("%-7u%-10s%-11u%u\n",pcb._PID,pcb.getStatStr(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
+        printf("%-8s%-7u%-10s%-11u%u\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
     }
 }
 void MyOS::mem()
 {
 
 }
-void MyOS::createfile(const string&filename)
+void MyOS::createfile(const std::string&filename)
 {
 
 }
-void MyOS::deletefile(const string&filenmae)
+void MyOS::deletefile(const std::string&filenmae)
 {
 
 }
 void MyOS::run_one_cycle()
 {
+
     //进程调度
     proc_schedule();
     //运行当前进程
-    if(_ready)
-
-    //检查阻塞队列是否有要唤醒的
-
-    
+    _time++;
+    if(!_ready_list.empty())
+    {
+        auto& pcb = _ready_list.front();
+        pcb._TTL--;
+        pcb._lifelong++;
+        pcb._slice_len--;
+        if(pcb._TTL == 0)
+        {
+            pcb._status = PCB::EXIT;
+            proc_kill(pcb._PID);
+        }
+    }
 }
 
 uint64_t MyOS::getTime()
@@ -89,14 +101,13 @@ int32_t MyOS::proc_create_pid()
     }
     else 
     {
+        _max_pid++;
         return ret;
     }
 }
 
 void MyOS::proc_kill(pid_t pid)
 {
-    proc_kill(pid);
-
     //释放内存
     {
         auto it = _ready_list.begin();
@@ -106,10 +117,10 @@ void MyOS::proc_kill(pid_t pid)
             {
                 realse_npage(it->_memory_struct->_npage,it->_memory_struct->total_size);
                 delete it->_memory_struct;
-                return;
+                break;
             }
         }
-    
+        {    
         auto it = _blocked_list.begin();
         while(it != _blocked_list.end())
         {
@@ -117,9 +128,9 @@ void MyOS::proc_kill(pid_t pid)
             {
                 realse_npage(it->_memory_struct->_npage,it->_memory_struct->total_size);
                 delete it->_memory_struct;
-                return;
+                break;
             }
-        }
+        }}
     }
     //移出队列
     {
@@ -133,7 +144,8 @@ void MyOS::proc_kill(pid_t pid)
             }
         }
     
-        auto it = _blocked_list.begin();
+        {        
+            auto it = _blocked_list.begin();
         while(it != _blocked_list.end())
         {
             if(it->_PID == pid)
@@ -141,7 +153,7 @@ void MyOS::proc_kill(pid_t pid)
                 _blocked_list.erase(it);
                 return;
             }
-        }
+        }}
     }
 
 }
@@ -178,20 +190,71 @@ void MyOS::proc_wakeup(pid_t id)
 }
 void MyOS::proc_schedule()
 {
+    //调度就绪队列
     auto it = _ready_list.begin();
-    if(it != _ready_list.end())
+    while(it != _ready_list.end())
     {
+        //时间片不足
         if(it->_slice_len == 0)
         {
             it->_status = PCB::READY;
+            it->_slice_len = ROUND_LEN;
             _ready_list.push_back(*it);
-            _ready_list.pop_front();
+            it = _ready_list.erase(it);
+        }
+        //触发IO时间
+        else if(it->_has_io && it->_io_start == it->_lifelong)
+        {
+            it->_status = PCB::BLOCKED;
+            it->_io_end = _time + it->_io_time;
+            it->_slice_len = ROUND_LEN;
+            _blocked_list.push_back(*it);
+            it = _ready_list.erase(it);
+        }
+        else 
+        {
+            it->_status = PCB::RUN;
+            break;//退出调度
         }
     }
-
     _ready_list.front()._status = PCB::RUN;
+    //调度阻塞队列
+    if(!_blocked_list.empty())
+    {
+        for(auto it = _blocked_list.begin();it != _blocked_list.end();)
+        {
+            if(it->_has_io == true && it->_io_end == _time)
+            {
+                it->_has_io = false;
+                it->_slice_len = ROUND_LEN;
+                _ready_list.push_back(*it);
+                it = _blocked_list.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
 }
 uint64_t MyOS::npage2addr(uint64_t npage)
 {
     return (npage << PAGE_SHIFT);
+}
+
+uint64_t MyOS::get_npage()
+{
+
+}
+void MyOS::realse_npage(uint64_t npage,uint64_t size)
+{
+
+}
+void MyOS::swapin(PageTable& pt)
+{
+
+}
+void MyOS::swapout(PageTable& pt)
+{
+
 }
