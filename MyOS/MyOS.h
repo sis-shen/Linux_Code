@@ -5,6 +5,7 @@
 #include "Mem.h"
 #include "PCB.h"
 #include <list>
+#include <map>
 using namespace std;
 
 #define OS_MAX_TIME UINT64_MAX
@@ -12,7 +13,12 @@ using namespace std;
 namespace sup{
     class MyOS
     {
-        MyOS(){};
+        MyOS()
+        {
+            set_mem();
+            set_disk();
+            _page_table.set_mem(pmem);
+        };
         MyOS(const MyOS&) = delete;
         MyOS operator=(const MyOS&) = delete;
     public:
@@ -43,15 +49,20 @@ namespace sup{
         int32_t _max_pid = 1;
     //内存调度
     public:
+        void set_mem();
         uint64_t npage2addr(uint64_t npage);
-        uint64_t get_npage();
         void realse_npage(uint64_t npage,uint64_t size);
-        void swapin(PageTable& pt);
-        void swapout(PageTable& pt);
+        void swapin();
+        void swapout();
+    //文件系统
+        void set_disk();
+
     private:
         char* pmem;
         char* pdisk;
+        PageTable _page_table;
         uint64_t _time;
+
         std::list<PCB> _ready_list;
         std::list<PCB> _blocked_list;
     }; 

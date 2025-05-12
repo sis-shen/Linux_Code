@@ -10,6 +10,7 @@ public:
 
 uint64_t _npage;
 uint64_t total_size;
+void* _start;
 
 ////////////////////////////
 unsigned long task_size;/* size of task vm space */

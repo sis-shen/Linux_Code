@@ -27,8 +27,12 @@ void MyOS::proc_creat(const std::string&proc_name,uint64_t TTL,uint64_t mem_sz,u
         pcb._has_io = false;
     }
 
+    size_t npages = PageStruct::sz_to_npages(mem_sz);
+    void* pstart = _page_table.allocate(npages);
+    if(pstart == nullptr) return;   //内存申请失败了
     auto mem = new MemoryStruct;
     mem->total_size = mem_sz;
+    mem->_npage = PageStruct::ptr_to_npage(pstart,pmem);
     pcb._memory_struct = mem;
     pcb._status = PCB::CREATE;
     pcb._slice_len = ROUND_LEN;
@@ -54,10 +58,12 @@ void MyOS::psproc()
         printf("%-8s%-7u%-10s%-11u%u\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
     }
 }
+
 void MyOS::mem()
 {
-
+    printf("总内存: %u字节\t 已使用: %u字节\t 空闲: %u字节\n",_page_table.get_total_pages()*PAGE_SIZE,_page_table.get_used_pages()*PAGE_SIZE,_page_table.get_free_pages()*PAGE_SIZE);
 }
+
 void MyOS::createfile(const std::string&filename)
 {
 
@@ -242,19 +248,25 @@ uint64_t MyOS::npage2addr(uint64_t npage)
     return (npage << PAGE_SHIFT);
 }
 
-uint64_t MyOS::get_npage()
-{
 
-}
 void MyOS::realse_npage(uint64_t npage,uint64_t size)
 {
-
+    _page_table.free_mem(npage,PageStruct::sz_to_npages(size));
 }
-void MyOS::swapin(PageTable& pt)
+void MyOS::swapin()
 {
 
 }
-void MyOS::swapout(PageTable& pt)
+void MyOS::swapout()
 {
 
+}
+
+void MyOS::set_mem()
+{
+    pmem = (char*) malloc(MEMORY_SIZE);
+}
+void MyOS::set_disk()
+{
+    pdisk = (char*) malloc(DISK_SIZE);
 }
