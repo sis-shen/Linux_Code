@@ -16,7 +16,8 @@ void MyOS::proc_creat(const std::string&proc_name,uint64_t TTL,uint64_t mem_sz,u
     pcb._TTL = TTL;
     pcb._lifelong = 0;
     pcb._name = proc_name;
-    if(io_start > io_end)
+    // std::cout<<"debug:"<<io_start<<"\t"<<io_end<<std::endl;
+    if(io_start < io_end)
     {
         pcb._io_start = io_start;//这里存的是相对时间
         pcb._io_time = io_end-io_start;
@@ -50,28 +51,34 @@ void MyOS::psproc()
     printf("name    pid    status    address    size\n");
     for(auto& pcb: _ready_list)
     {
-        printf("%-8s%-7u%-10s%-11u%u\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
+        printf("%-8s%-7u%-10s%-11lu%lu\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
     }
 
     for(auto& pcb: _blocked_list)
     {
-        printf("%-8s%-7u%-10s%-11u%u\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
+        printf("%-8s%-7u%-10s%-11lu%lu\n",pcb._name.c_str(),pcb._PID,pcb.getStatStr().c_str(),npage2addr(pcb._memory_struct->_npage),pcb._memory_struct->total_size);
     }
 }
 
 void MyOS::mem()
 {
-    printf("总内存: %u字节\t 已使用: %u字节\t 空闲: %u字节\n",_page_table.get_total_pages()*PAGE_SIZE,_page_table.get_used_pages()*PAGE_SIZE,_page_table.get_free_pages()*PAGE_SIZE);
+    printf("总内存: %lu字节\t 已使用: %lu字节\t 空闲: %lu字节\n",_page_table.get_total_pages()*PAGE_SIZE,_page_table.get_used_pages()*PAGE_SIZE,_page_table.get_free_pages()*PAGE_SIZE);
 }
 
-void MyOS::createfile(const std::string&filename)
+void MyOS::creatfile(const std::string&filename,uint64_t size)
 {
-
+    _fs.create_file(filename,size);
 }
 void MyOS::deletefile(const std::string&filenmae)
 {
-
+    _fs.delete_file(filenmae);
 }
+void MyOS::lsfile(const std::string&filenmae)
+{
+    _fs.ls_file(filenmae);
+}
+
+
 void MyOS::run_one_cycle()
 {
 

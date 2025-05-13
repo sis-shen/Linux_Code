@@ -17,6 +17,7 @@ namespace sup{
         {
             set_mem();
             set_disk();
+            _fs.set_pdisk(pdisk);
             _page_table.set_mem(pmem);
         };
         MyOS(const MyOS&) = delete;
@@ -33,8 +34,6 @@ namespace sup{
         void killproc(pid_t pid);
         void psproc();
         void mem();
-        void createfile(const string&filename);
-        void deletefile(const string&filenmae);
         void run_one_cycle();
         uint64_t getTime();
 
@@ -57,12 +56,17 @@ namespace sup{
     //文件系统
         void set_disk();
 
+        void creatfile(const std::string&filename,uint64_t size);
+        void deletefile(const std::string&filename);
+        void lsfile(const std::string&filename);
+        
+
     private:
         char* pmem;
         char* pdisk;
         PageTable _page_table;
         uint64_t _time;
-
+        FileSystem _fs;
         std::list<PCB> _ready_list;
         std::list<PCB> _blocked_list;
     }; 

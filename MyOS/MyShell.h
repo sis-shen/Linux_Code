@@ -53,10 +53,11 @@ public:
             else if(cmd == "creatfile")
             {
                 string filename;
-                if(ss >> filename) {
-                    os.createfile(filename);
+                uint64_t size;
+                if(ss >> filename >> size) {
+                    os.creatfile(filename,size);
                 } else {
-                    cout << "用法: creatfile <文件名>\n";
+                    cout << "用法: creatfile <文件名> <文件大小>\n";
                 }
             }
             else if(cmd == "deletefile") 
@@ -66,6 +67,15 @@ public:
                     os.deletefile(filename);
                 } else {
                     cout << "用法: deletefile <文件名>\n";
+                }
+            }
+            else if(cmd == "lsfile") 
+            {
+                string filename;
+                if(ss >> filename) {
+                    os.lsfile(filename);
+                } else {
+                    cout << "用法: lsfile <文件名>\n";
                 }
             }
             else if(cmd == "exit")
