@@ -7,7 +7,7 @@
 
 namespace btyGoose{
 extern std::shared_ptr<spdlog::logger> g_default_logger;
-void init_logger(bool mode, const std::string &file, int32_t level);
+void init_logger(bool mode = false, const std::string &file  = "./log.log", int32_t level  = spdlog::level::level_enum::trace);
 
 #define SUP_LOG_TRACE(format, ...) btyGoose::g_default_logger->trace(std::string("[{}:{}] ") + format, __FILE__, __LINE__, ##__VA_ARGS__)
 #define SUP_LOG_DEBUG(format, ...) btyGoose::g_default_logger->debug(std::string("[{}:{}] ") + format, __FILE__, __LINE__, ##__VA_ARGS__)
